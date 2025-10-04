@@ -1,105 +1,89 @@
-﻿# include <Siv3D.hpp> // Siv3D v0.6.16
+﻿# include <Siv3D.hpp>
 
 void Main()
 {
-	// 背景の色を設定する | Set the background color
-	Scene::SetBackground(ColorF{ 0.6, 0.8, 0.7 });
+	Window::Resize(1280, 720);
 
-	// 画像ファイルからテクスチャを作成する | Create a texture from an image file
-	const Texture texture{ U"example/windmill.png" };
+	// 2D 物理演算のシミュレーションステップ（秒）
+	constexpr double StepTime = (1.0 / 200.0);
 
-	// 絵文字からテクスチャを作成する | Create a texture from an emoji
-	const Texture emoji{ U"🦖"_emoji };
+	// 2D 物理演算のシミュレーション蓄積時間（秒）
+	double accumulatedTime = 0.0;
 
-	// 太文字のフォントを作成する | Create a bold font with MSDF method
-	const Font font{ FontMethod::MSDF, 48, Typeface::Bold };
+	// 2D 物理演算のワールド
+	P2World world;
 
-	// テキストに含まれる絵文字のためのフォントを作成し、font に追加する | Create a font for emojis in text and add it to font as a fallback
-	const Font emojiFont{ 48, Typeface::ColorEmoji };
-	font.addFallback(emojiFont);
+	// 地面
+	Array<P2Body> grounds;
+	grounds << world.createRect(P2Static, Vec2{ 0, -200 }, SizeF{ 600, 20 });
+	grounds << world.createLine(P2Static, Vec2{ 0, 0 }, Line{ -500, -150, -300, -50 });
+	grounds << world.createLineString(P2Static, Vec2{ 0, 0 }, LineString{ Vec2{ 100, -50 }, Vec2{ 200, -50 }, Vec2{ 600, -150 } });
 
-	// ボタンを押した回数 | Number of button presses
-	int32 count = 0;
+	Array<P2Body> bodies;
 
-	// チェックボックスの状態 | Checkbox state
-	bool checked = false;
-
-	// プレイヤーの移動スピード | Player's movement speed
-	double speed = 200.0;
-
-	// プレイヤーの X 座標 | Player's X position
-	double playerPosX = 400;
-
-	// プレイヤーが右を向いているか | Whether player is facing right
-	bool isPlayerFacingRight = true;
+	// 2D カメラ（中心座標 (0, -300), 拡大率 1.0）
+	Camera2D camera{ Vec2{ 0, -300 }, 1.0 };
 
 	while (System::Update())
 	{
-		// テクスチャを描く | Draw the texture
-		texture.draw(20, 20);
+		ClearPrint();
+		Print << U"bodies.size(): " << bodies.size() << U"\n";
 
-		// テキストを描く | Draw text
-		font(U"Hello, Siv3D!🎮").draw(64, Vec2{ 20, 340 }, ColorF{ 0.2, 0.4, 0.8 });
-
-		// 指定した範囲内にテキストを描く | Draw text within a specified area
-		font(U"Siv3D (シブスリーディー) は、ゲームやアプリを楽しく簡単な C++ コードで開発できるフレームワークです。")
-			.draw(18, Rect{ 20, 430, 480, 200 }, Palette::Black);
-
-		// 長方形を描く | Draw a rectangle
-		Rect{ 540, 20, 80, 80 }.draw();
-
-		// 角丸長方形を描く | Draw a rounded rectangle
-		RoundRect{ 680, 20, 80, 200, 20 }.draw(ColorF{ 0.0, 0.4, 0.6 });
-
-		// 円を描く | Draw a circle
-		Circle{ 580, 180, 40 }.draw(Palette::Seagreen);
-
-		// 矢印を描く | Draw an arrow
-		Line{ 540, 330, 760, 260 }.drawArrow(8, SizeF{ 20, 20 }, ColorF{ 0.4 });
-
-		// 半透明の円を描く | Draw a semi-transparent circle
-		Circle{ Cursor::Pos(), 40 }.draw(ColorF{ 1.0, 0.0, 0.0, 0.5 });
-
-		// ボタン | Button
-		if (SimpleGUI::Button(U"count: {}"_fmt(count), Vec2{ 520, 370 }, 120, (checked == false)))
+		for (accumulatedTime += Scene::DeltaTime(); StepTime <= accumulatedTime; accumulatedTime -= StepTime)
 		{
-			// カウントを増やす | Increase the count
-			++count;
+			// 2D 物理演算のワールドを StepTime 秒進める
+			world.update(StepTime);
+
+			// 地面の下に 500 cm 以上落下した物体を削除する
+			bodies.remove_if([](const P2Body& body) { return (500 < body.getPos().y); });
 		}
 
-		// チェックボックス | Checkbox
-		SimpleGUI::CheckBox(checked, U"Lock \U000F033E", Vec2{ 660, 370 }, 120);
-
-		// スライダー | Slider
-		SimpleGUI::Slider(U"speed: {:.1f}"_fmt(speed), speed, 100, 400, Vec2{ 520, 420 }, 140, 120);
-
-		// 左キーが押されていたら | If left key is pressed
-		if (KeyLeft.pressed())
+		// 2D カメラを更新する
+		camera.update();
 		{
-			// プレイヤーが左に移動する | Player moves left
-			playerPosX = Max((playerPosX - speed * Scene::DeltaTime()), 60.0);
-			isPlayerFacingRight = false;
+			// 2D カメラから Transformer2D を作成する
+			const auto t = camera.createTransformer();
+
+			// すべての地面を描画する
+			for (const auto& ground : grounds)
+			{
+				ground.draw(Palette::Gray);
+			}
+
+			// すべてのボディを描画する
+			for (const auto& body : bodies)
+			{
+				body.draw(HSV{ body.id() * 10.0 });
+			}
 		}
 
-		// 右キーが押されていたら | If right key is pressed
-		if (KeyRight.pressed())
+		// 2D カメラの操作を描画する
+		camera.draw(Palette::Orange);
+
+		if (SimpleGUI::Button(U"Circle", Vec2{ 40, 80 }, 120))
 		{
-			// プレイヤーが右に移動する | Player moves right
-			playerPosX = Min((playerPosX + speed * Scene::DeltaTime()), 740.0);
-			isPlayerFacingRight = true;
+			bodies << world.createCircle(P2Dynamic, Vec2{ Random(-400, 400), -600 }, 20);
 		}
 
-		// プレイヤーを描く | Draw the player
-		emoji.scaled(0.75).mirrored(isPlayerFacingRight).drawAt(playerPosX, 540);
+		if (SimpleGUI::Button(U"Rect", Vec2{ 40, 120 }, 120))
+		{
+			bodies << world.createRect(P2Dynamic, Vec2{ Random(-400, 400), -600}, Size{20, 60});
+		}
+
+		if (SimpleGUI::Button(U"Triangle", Vec2{ 40, 160 }, 120))
+		{
+			bodies << world.createTriangle(P2Dynamic, Vec2{ Random(-400, 400), -600 }, Triangle{ 40 });
+		}
+
+		if (SimpleGUI::Button(U"Quad", Vec2{ 40, 200 }, 120))
+		{
+			bodies << world.createQuad(P2Dynamic, Vec2{ Random(-400, 400), -600 }, RectF{ Arg::center(0, 0), 40 }.skewedX(45_deg) );
+		}
+
+		if (SimpleGUI::Button(U"Polygon", Vec2{ 40, 240 }, 120))
+		{
+			const Polygon polygon = Shape2D::NStar(5, 30, 20);
+			bodies << world.createPolygon(P2Dynamic, Vec2{ Random(-400, 400), -600 }, polygon);
+		}
 	}
 }
-
-//
-// - Debug ビルド: プログラムの最適化を減らす代わりに、エラーやクラッシュ時に詳細な情報を得られます。
-//
-// - Release ビルド: 最大限の最適化でビルドします。
-//
-// - [デバッグ] メニュー → [デバッグの開始] でプログラムを実行すると、[出力] ウィンドウに詳細なログが表示され、エラーの原因を探せます。
-//
-// - Visual Studio を更新した直後は、プログラムのリビルド（[ビルド]メニュー → [ソリューションのリビルド]）が必要な場合があります。
-//
