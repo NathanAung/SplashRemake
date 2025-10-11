@@ -13,7 +13,6 @@ void Main()
 
 	Array<P2Body> grounds;
 	grounds << world.createRect(P2Static, Vec2{ 0, 0 }, SizeF{ 1000, 10 });
-	grounds << world.createLine(P2Static, Vec2{ 0, 0 }, Line{ -800, -200, -300, -100 });
 
 
 
