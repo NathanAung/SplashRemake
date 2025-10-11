@@ -1,5 +1,7 @@
 ﻿# include <Siv3D.hpp>
 
+# include "MeleeEnemy.h"
+
 
 void Main()
 {
@@ -9,10 +11,13 @@ void Main()
 
 	double accumulatedTime = 0.0;
 
-	P2World world;
+
+	P2World* world = new P2World();
 
 	Array<P2Body> grounds;
-	grounds << world.createRect(P2Static, Vec2{ 0, 0 }, SizeF{ 1000, 10 });
+	grounds << world->createRect(P2Static, Vec2{ 0, 0 }, SizeF{ 1000, 10 });
+
+	MeleeEnemy enemy1 = MeleeEnemy(world);
 
 
 
@@ -24,9 +29,11 @@ void Main()
 	{
 		for (accumulatedTime += Scene::DeltaTime(); StepTime <= accumulatedTime; accumulatedTime -= StepTime)
 		{
-			world.update(StepTime);
+			world->update(StepTime);
 
 		}
+
+		enemy1.update();
 
 		camera.update();
 		{
@@ -36,7 +43,7 @@ void Main()
 			{
 				ground.draw(Palette::Gray);
 			}
-
+			enemy1.draw();
 		}
 
 		camera.draw(Palette::Orange);
