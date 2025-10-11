@@ -64,6 +64,8 @@ void DungeonMap::DrawMap(Texture mapTex, int32 mode)
 				mapTex(0, 0, 32, 32).draw(pos);
 			else if (mode == 1)	// draw correct tiles
 				mapTex(tileType * 32, 0, 32, 32).draw(pos);
+			else if (mode == 2 && tileType == 1) // make tile 1 black
+				mapTex(32, 0, 32, 32).draw(pos,ColorF{ 0.0 });
 		}
 	}
 }

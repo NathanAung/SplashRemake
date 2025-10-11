@@ -10,6 +10,6 @@ void Main()
 	while (System::Update())
 	{
 		dungeonMap.DrawMap(mapTexture, 0);
-		dungeonMap.DrawMap(mapTexture, 1);
+		dungeonMap.DrawMap(mapTexture, 2);
 	}
 }
