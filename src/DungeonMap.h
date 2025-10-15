@@ -13,9 +13,9 @@ public:
 		firstOnly,
 	};
 	DungeonMap();
-	void DrawMap(Texture mapTex, int32 mode);
-	Array<P2Body> CreateMapCol(P2World pWorld);
-	void DrawMapCol(Array<P2Body>& mapColArr);
+	void DrawMap(Texture mapTex, int32 mode);	// draw the map on the screen
+	Array<P2Body> CreateMapCol(P2World pWorld);	// create colliders for the map
+	void DrawMapCol(Array<P2Body>& mapColArr);	// draw map for debugging
 
 private:
 	int32 const tileWidth = 32;		// in pixels
