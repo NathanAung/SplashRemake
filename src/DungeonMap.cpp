@@ -6,44 +6,67 @@ DungeonMap::DungeonMap() : mapFloor(0)
 	map =
 	{
 		{
-			//	 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
-				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},	//	0
-				{1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},	//	1
-				{1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},	//	2
-				{1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},	//	3
-				{1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},	//	4
-				{1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},	//	5
-				{1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},	//	6
-				{1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},	//	7
-				{1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},	//	8
-				{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},	//	9
-				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1},	//	0
-				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1},	//	1
-				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1},	//	2
-				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1},	//	3
-				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1},	//	4
-				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1},	//	5
-				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1},	//	6
-				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1},	//	7
-				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},	//	8
-				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},	//	9
-			},
+		//	 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	0
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	1
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	2
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	3
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	4
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	5
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	6
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	7
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	8
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	9
+			{0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0},	//	0
+			{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0},	//	1
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	2
+			{1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	3
+			{1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0},	//	4
+			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	5
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	6
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	7
+			{1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},	//	8
+			{1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	9
+		},
+		// {
+		// //	 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+		// 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},	//	0
+		// 	{1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},	//	1
+		// 	{1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},	//	2
+		// 	{1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},	//	3
+		// 	{1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},	//	4
+		// 	{1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},	//	5
+		// 	{1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},	//	6
+		// 	{1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},	//	7
+		// 	{1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},	//	8
+		// 	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},	//	9
+		// 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1},	//	0
+		// 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1},	//	1
+		// 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1},	//	2
+		// 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1},	//	3
+		// 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1},	//	4
+		// 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1},	//	5
+		// 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1},	//	6
+		// 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1},	//	7
+		// 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},	//	8
+		// 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},	//	9
+		// },
 	};
 }
 
 // Get Tile Type (Lower 8 bits)
 int32 DungeonMap::GetTileType(int32 x, int32 y) {
-    return map[mapFloor][y][x] & 0xFF;  // Mask the lower 8 bits
+	return map[mapFloor][y][x] & 0xFF;  // Mask the lower 8 bits
 }
 
 // Get Collider (Next 8 bits)
 int32 DungeonMap::GetTileCol(int32 x, int32 y) {
-    return (map[mapFloor][y][x] >> 8) & 0xFF;  // Shift right by 8 and mask the next 8 bits
+	return (map[mapFloor][y][x] >> 8) & 0xFF;  // Shift right by 8 and mask the next 8 bits
 }
 
 // Get Tile Status (Next 8 bits)
 int32 DungeonMap::GetTileStat(int32 x, int32 y) {
-    return (map[mapFloor][y][x] >> 16) & 0xFF;  // Shift right by 16 and mask the next 8 bits
+	return (map[mapFloor][y][x] >> 16) & 0xFF;  // Shift right by 16 and mask the next 8 bits
 }
 
 // // Get Additional Info (Upper 8 bits)
@@ -53,19 +76,77 @@ int32 DungeonMap::GetTileStat(int32 x, int32 y) {
 
 void DungeonMap::DrawMap(Texture mapTex, int32 mode)
 {
-	for (int32 y : step(20))
+	for (int32 y : step(mapHeight))
 	{
-		for (int32 x : step(20))
+		for (int32 x : step(mapWidth))
 		{
-			Vec2 pos(x * 32, y * 32);
+			Vec2 pos(x * tileWidth, y * tileHeight);
 			int32 tileType = GetTileType(x, y);
 			int32 tileStat = GetTileStat(x, y);
 			if (mode == 0)	// all first tile
-				mapTex(0, 0, 32, 32).draw(pos);
+				mapTex(0, 0, tileWidth, tileHeight).draw(pos);
 			else if (mode == 1)	// draw correct tiles
-				mapTex(tileType * 32, 0, 32, 32).draw(pos);
+				mapTex(tileType * tileWidth, 0, tileWidth, tileHeight).draw(pos);
 			else if (mode == 2 && tileType == 1) // make tile 1 black
-				mapTex(32, 0, 32, 32).draw(pos,ColorF{ 0.0 });
+				mapTex(tileWidth * 1, 0, tileWidth, tileHeight).draw(pos, ColorF{ 0.0 });
 		}
+	}
+}
+
+Array<P2Body> DungeonMap::CreateMapCol(P2World pWorld)
+{
+	Array<P2Body> bodies;
+	for (int32 y : step(mapHeight))
+	{
+		bool tileExist = false;
+		Vec2 existPos;
+		int tileCount = 0;
+		for (int32 x : step(mapWidth))
+		{
+			Vec2 pos(x * tileWidth, y * tileHeight+ tileHeight/2);
+			int32 tileType = GetTileType(x, y);
+			int32 tileStat = GetTileStat(x, y);
+			
+			if(tileType == 1){
+				if(tileExist){
+					tileCount++;
+				}
+				else{
+					existPos = pos;
+					tileExist = true;
+					tileCount++;
+				}
+			}
+			else if(tileExist){
+				existPos.x += (tileWidth/2) * tileCount;
+				bodies << pWorld.createRect(P2Static, existPos, SizeF{tileWidth * tileCount, tileHeight});
+				Print << U"Tiles placed " << tileCount;
+				Print << U"body placed at " << existPos;
+				tileExist = false;
+				tileCount = 0;
+			}
+			else{
+				existPos = pos;
+			}
+		}
+
+		if(tileExist){
+			existPos.x += (tileWidth/2) * tileCount;
+			bodies << pWorld.createRect(P2Static, existPos, SizeF{tileWidth * tileCount, tileHeight});
+			Print << U"Tiles placed " << tileCount;
+			Print << U"body placed at " << existPos;
+			tileExist = false;
+			tileCount = 0;
+		}
+	}
+
+	return bodies;
+}
+
+void DungeonMap::DrawMapCol(Array<P2Body>& mapColArr){
+	// Draw all bodies
+	for (const auto& body : mapColArr)
+	{
+		body.draw(HSV{ body.id() * 10.0 });
 	}
 }

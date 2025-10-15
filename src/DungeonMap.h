@@ -7,9 +7,21 @@ class DungeonMap
 	int32 mapFloor;
 
 public:
+	enum mapModes{
+		bg,
+		normal,
+		firstOnly,
+	};
 	DungeonMap();
 	void DrawMap(Texture mapTex, int32 mode);
+	Array<P2Body> CreateMapCol(P2World pWorld);
+	void DrawMapCol(Array<P2Body>& mapColArr);
+
 private:
+	int32 const tileWidth = 32;		// in pixels
+	int32 const tileHeight = 32;
+	int32 mapWidth = 20;	// in tiles
+	int32 mapHeight = 20;
 	int32 GetTileType(int32 x, int32 y);
 	int32 GetTileCol(int32 x, int32 y);
 	int32 GetTileStat(int32 x, int32 y);
