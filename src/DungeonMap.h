@@ -4,18 +4,44 @@
 class DungeonMap
 {
 	Array<Grid<int32>> map;
-	int32 mapFloor;
+	int32 mapLayer;
+
+	
+
 
 public:
+	struct Gimmick{
+		int type = 0;
+		int colSize = 32;
+		int posX = 0;
+		int posY = 0;
+		bool activated = false;
+		int pairColIndx = 0;
+		
+		Rect collider;
+
+		Gimmick(int t, int x, int y, int size){
+			type = t;
+			posX = x;
+			posY = y;
+			colSize = size;
+
+			collider = Rect{x, y, size};
+		}
+	};
 	enum mapModes{
 		bg,
 		normal,
 		firstOnly,
 	};
 	DungeonMap();
-	void DrawMap(Texture mapTex, int32 mode);	// draw the map on the screen
-	Array<P2Body> CreateMapCol(P2World pWorld);	// create colliders for the map
+	void DrawMap(Texture& mapTex, int32 mode);	// draw the map on the screen
+	Array<P2Body> CreateMapCol(P2World& pWorld);	// create colliders for the map
 	void DrawMapCol(Array<P2Body>& mapColArr);	// draw map for debugging
+	Array<Gimmick> CreateMapGimmicks();
+	void UpdateMapGimmicks(Array<Gimmick>& gimmickArr, P2Body& player);
+	void LinkGimmck();
+	void ActivateGimmick();
 
 private:
 	int32 const tileWidth = 32;		// in pixels
@@ -25,5 +51,5 @@ private:
 	int32 GetTileType(int32 x, int32 y);
 	int32 GetTileCol(int32 x, int32 y);
 	int32 GetTileStat(int32 x, int32 y);
-	//int32 GetTileSomething(int32 x, int32 y);
+	int32 GetTilePairIdx(int32 x, int32 y);
 };

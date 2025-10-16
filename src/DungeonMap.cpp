@@ -1,7 +1,7 @@
 #include "../stdafx.h"
 #include "DungeonMap.h"
 
-DungeonMap::DungeonMap() : mapFloor(0)
+DungeonMap::DungeonMap()
 {
 	map =
 	{
@@ -16,7 +16,7 @@ DungeonMap::DungeonMap() : mapFloor(0)
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	6
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	7
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	8
-			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	9
+			{0,0,0,0,0,0,0x00000009,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	9
 			{0x00000101,0,0,0,0,0,0x00000101,0x00000101,0x00000101,0x00000101,0x00000101,0,0,0,0,0,0,0,0,0},	//	0
 			{0,0x00000101,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0x00000101,0x00000101,0x00000101,0},	//	1
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	2
@@ -56,25 +56,25 @@ DungeonMap::DungeonMap() : mapFloor(0)
 
 // Get Tile Type (Lower 8 bits)
 int32 DungeonMap::GetTileType(int32 x, int32 y) {
-	return map[mapFloor][y][x] & 0xFF;  // Mask the lower 8 bits
+	return map[mapLayer][y][x] & 0xFF;  // Mask the lower 8 bits
 }
 
 // Get Collider (Next 8 bits)
 int32 DungeonMap::GetTileCol(int32 x, int32 y) {
-	return (map[mapFloor][y][x] >> 8) & 0xFF;  // Shift right by 8 and mask the next 8 bits
+	return (map[mapLayer][y][x] >> 8) & 0xFF;  // Shift right by 8 and mask the next 8 bits
 }
 
 // Get Tile Status (Next 8 bits)
 int32 DungeonMap::GetTileStat(int32 x, int32 y) {
-	return (map[mapFloor][y][x] >> 16) & 0xFF;  // Shift right by 16 and mask the next 8 bits
+	return (map[mapLayer][y][x] >> 16) & 0xFF;  // Shift right by 16 and mask the next 8 bits
 }
 
-// // Get Additional Info (Upper 8 bits)
-// int32 DungeonMap::GetTileSomething(int x, int y) {
-//     return (map[y][x] >> 24) & 0xFF;  // Shift right by 24 and mask the upper 8 bits
-// }
+// Get the pair index of the gimmick tiles (e.g. button and door) (Upper 8 bits)
+int32 DungeonMap::GetTilePairIdx(int x, int y) {
+    return (map[mapLayer][y][x] >> 24) & 0xFF;  // Shift right by 24 and mask the upper 8 bits
+}
 
-void DungeonMap::DrawMap(Texture mapTex, int32 mode)
+void DungeonMap::DrawMap(Texture& mapTex, int32 mode)
 {
 	for (int32 y : step(mapHeight))
 	{
@@ -93,7 +93,7 @@ void DungeonMap::DrawMap(Texture mapTex, int32 mode)
 	}
 }
 
-Array<P2Body> DungeonMap::CreateMapCol(P2World pWorld)
+Array<P2Body> DungeonMap::CreateMapCol(P2World& pWorld)
 {
 	Array<P2Body> bodies;
 	for (int32 y : step(mapHeight))
@@ -149,5 +149,37 @@ void DungeonMap::DrawMapCol(Array<P2Body>& mapColArr){
 	for (const auto& body : mapColArr)
 	{
 		body.draw(HSV{ body.id() * 10.0 });
+	}
+}
+
+Array<DungeonMap::Gimmick> DungeonMap::CreateMapGimmicks(){
+	Array<Gimmick> gimmicks;
+
+	for (int32 y : step(mapHeight))
+	{
+		for (int32 x : step(mapWidth))
+		{
+			Vec2 pos(x * tileWidth, y * tileHeight);
+			int32 tileType = GetTileType(x, y);
+			int32 tileStat = GetTileStat(x, y);
+			
+			if(tileType == 9){
+				gimmicks << Gimmick(0, x, y, tileWidth);
+				Print << U"gimmick placed at " << pos;
+			}
+		}
+	}
+
+	return gimmicks;
+}
+
+
+void DungeonMap::UpdateMapGimmicks(Array<Gimmick>& gimmickArr, P2Body& player){
+	for(int i = 0; i < gimmickArr.size(); i++){
+		Gimmick& gimmick = gimmickArr[i];
+
+		if(gimmick.collider.intersects(player)){
+			Console << U"intersecting";
+		}
 	}
 }

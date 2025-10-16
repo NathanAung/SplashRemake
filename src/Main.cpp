@@ -12,6 +12,7 @@ void Main()
 	Texture mapTexture(U"map.png");
 
 	Array<P2Body> mapColliders = dungeonMap.CreateMapCol(world);
+	Array<DungeonMap::Gimmick> mapGimmicks = dungeonMap.CreateMapGimmicks();
 
 
 	// 2D physics simulation step time (seconds)
@@ -21,19 +22,17 @@ void Main()
 	double accumulatedTime = 0.0;
 	// Create 3 bodies (circles with radius 10cm)
 	Array<P2Body> bodies;
-	bodies << world.createCircle(P2Dynamic, Vec2{ 100, -300 }, 10);
-	bodies << world.createCircle(P2Dynamic, Vec2{ 400, -600 }, 10);
 	bodies << world.createCircle(P2Dynamic, Vec2{ 200, -900 }, 10);
 
 
 
 	while (System::Update())
 	{
-		ClearPrint();
-		for (const auto& body : bodies)
-		{
-			Print << U"ID: {}, {:.1f} cm"_fmt(body.id(), body.getPos());
-		}
+		// ClearPrint();
+		// for (const auto& body : bodies)
+		// {
+		// 	Print << U"ID: {}, {:.1f} cm"_fmt(body.id(), body.getPos());
+		// }
 
 		for (accumulatedTime += Scene::DeltaTime(); StepTime <= accumulatedTime; accumulatedTime -= StepTime)
 		{
@@ -44,6 +43,7 @@ void Main()
 			bodies.remove_if([](const P2Body& body) { return (500 < body.getPos().y); });
 		}
 
+		dungeonMap.UpdateMapGimmicks(mapGimmicks, bodies[0]);
 
 		dungeonMap.DrawMap(mapTexture, 0);
 		dungeonMap.DrawMap(mapTexture, 1);
