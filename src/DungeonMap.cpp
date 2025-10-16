@@ -16,9 +16,9 @@ DungeonMap::DungeonMap()
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	6
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	7
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	8
-			{0,0,0,0,0,0,0x00000009,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	9
-			{0x00000101,0,0,0,0,0,0x00000101,0x00000101,0x00000101,0x00000101,0x00000101,0,0,0,0,0,0,0,0,0},	//	0
-			{0,0x00000101,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0x00000101,0x00000101,0x00000101,0},	//	1
+			{0,0,0,0,0,0,0x01000009,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	9
+			{0,0,0,0,0,0x00000101,0x01000104,0x00000101,0x00000101,0x00000101,0x00000101,0,0,0,0,0,0,0,0,0},	//	0
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	1
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	2
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	3
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	4
@@ -105,10 +105,11 @@ Array<P2Body> DungeonMap::CreateMapCol(P2World& pWorld)
 		{
 			Vec2 pos(x * tileWidth, y * tileHeight+ tileHeight/2);
 			int32 tileType = GetTileType(x, y);
-			int tileCol = GetTileCol(x, y);
+			int32 tileCol = GetTileCol(x, y);
 			int32 tileStat = GetTileStat(x, y);
+			int32 tileObs = GetTilePairIdx(x, y);
 			
-			if(tileCol == 1){
+			if(tileType == 1 && tileCol == 1){
 				if(tileExist){
 					tileCount++;
 				}
@@ -118,11 +119,30 @@ Array<P2Body> DungeonMap::CreateMapCol(P2World& pWorld)
 					tileCount++;
 				}
 			}
+			else if(tileType == 4 && tileCol == 1){
+				if(tileExist){
+					existPos.x += (tileWidth/2) * tileCount;
+					bodies << pWorld.createRect(P2Static, existPos, SizeF{tileWidth * tileCount, tileHeight});
+					Print << U"Tiles placed " << tileCount;
+					Print << U"body placed at " << existPos;
+					Print << U"body array size " << bodies.size();
+					tileExist = false;
+					tileCount = 0;
+				}
+				
+				pos.x += tileWidth/2;
+				bodies << pWorld.createRect(P2Static, pos, SizeF{tileWidth, tileHeight});
+				
+				Print << U"door placed at " << pos;
+				Print << U"body array size " << bodies.size();
+
+			}
 			else if(tileExist){
 				existPos.x += (tileWidth/2) * tileCount;
 				bodies << pWorld.createRect(P2Static, existPos, SizeF{tileWidth * tileCount, tileHeight});
 				Print << U"Tiles placed " << tileCount;
 				Print << U"body placed at " << existPos;
+				Print << U"body array size " << bodies.size();
 				tileExist = false;
 				tileCount = 0;
 			}
@@ -174,19 +194,24 @@ Array<DungeonMap::Gimmick> DungeonMap::CreateMapGimmicks(){
 }
 
 
-void DungeonMap::UpdateMapGimmicks(Array<Gimmick>& gimmickArr, P2Body& player){
+void DungeonMap::UpdateMapGimmicks(Array<Gimmick>& gimmickArr, Array<P2Body>& mapColArr, P2Body& player){
 	const Circle c{player.getPos().x, player.getPos().y, tileWidth/2};
 	for(int i = 0; i < gimmickArr.size(); i++){
 		Gimmick& gimmick = gimmickArr[i];
 
 		if(gimmick.collider.intersects(c)){
-			Print << U"intersecting";
+			//Print << U"intersecting";
 		}
 
 		//Print << player.getPos().x;
 		//Print << player.getPos().y;
 
-		gimmick.collider.draw(Palette::Cyan);
-		c.draw(Palette::Green);
+		//gimmick.collider.draw(Palette::Cyan);
+		//c.draw(Palette::Green);
 	}
+}
+
+
+void DungeonMap::ActivateGimmick(Gimmick& gimmick, Array<P2Body>& mapColArr){
+	
 }

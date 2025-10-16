@@ -39,9 +39,9 @@ public:
 	Array<P2Body> CreateMapCol(P2World& pWorld);	// create colliders for the map
 	void DrawMapCol(Array<P2Body>& mapColArr);	// draw map for debugging
 	Array<Gimmick> CreateMapGimmicks();
-	void UpdateMapGimmicks(Array<Gimmick>& gimmickArr, P2Body& player);
-	void LinkGimmck();
-	void ActivateGimmick();
+	void UpdateMapGimmicks(Array<Gimmick>& gimmickArr, Array<P2Body>& mapColArr, P2Body& player);
+	void LinkGimmick();
+	void ActivateGimmick(Gimmick& gimmick, Array<P2Body>& mapColArr);
 
 private:
 	int32 const tileWidth = 32;		// in pixels

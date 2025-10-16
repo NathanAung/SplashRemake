@@ -55,6 +55,6 @@ void Main()
 			body.draw(HSV{ body.id() * 10.0 });
 		}
 
-		dungeonMap.UpdateMapGimmicks(mapGimmicks, bodies[0]);
+		dungeonMap.UpdateMapGimmicks(mapGimmicks, mapColliders, bodies[0]);
 	}
 }
