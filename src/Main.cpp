@@ -43,7 +43,7 @@ void Main()
 			bodies.remove_if([](const P2Body& body) { return (500 < body.getPos().y); });
 		}
 
-		dungeonMap.UpdateMapGimmicks(mapGimmicks, bodies[0]);
+		
 
 		dungeonMap.DrawMap(mapTexture, 0);
 		dungeonMap.DrawMap(mapTexture, 1);
@@ -54,5 +54,7 @@ void Main()
 		{
 			body.draw(HSV{ body.id() * 10.0 });
 		}
+
+		dungeonMap.UpdateMapGimmicks(mapGimmicks, bodies[0]);
 	}
 }

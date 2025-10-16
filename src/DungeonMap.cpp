@@ -164,7 +164,7 @@ Array<DungeonMap::Gimmick> DungeonMap::CreateMapGimmicks(){
 			int32 tileStat = GetTileStat(x, y);
 			
 			if(tileType == 9){
-				gimmicks << Gimmick(0, x, y, tileWidth);
+				gimmicks << Gimmick(0, pos.x, pos.y, tileWidth);
 				Print << U"gimmick placed at " << pos;
 			}
 		}
@@ -175,11 +175,18 @@ Array<DungeonMap::Gimmick> DungeonMap::CreateMapGimmicks(){
 
 
 void DungeonMap::UpdateMapGimmicks(Array<Gimmick>& gimmickArr, P2Body& player){
+	const Circle c{player.getPos().x, player.getPos().y, tileWidth/2};
 	for(int i = 0; i < gimmickArr.size(); i++){
 		Gimmick& gimmick = gimmickArr[i];
 
-		if(gimmick.collider.intersects(player)){
-			Console << U"intersecting";
+		if(gimmick.collider.intersects(c)){
+			Print << U"intersecting";
 		}
+
+		//Print << player.getPos().x;
+		//Print << player.getPos().y;
+
+		gimmick.collider.draw(Palette::Cyan);
+		c.draw(Palette::Green);
 	}
 }
