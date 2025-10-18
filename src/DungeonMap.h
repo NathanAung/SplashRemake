@@ -17,16 +17,19 @@ public:
 		int posY = 0;
 		bool activated = false;
 		int pairColIndx = 0;
+		int pairColX;
+		int pairColY;
 		
 		Rect collider;
 
-		Gimmick(int t, int x, int y, int size){
+		Gimmick(int t, int x, int y, int size, int pairIdx){
 			type = t;
 			posX = x;
 			posY = y;
 			colSize = size;
+			pairColIndx = pairIdx;
 
-			collider = Rect{x, y, size};
+			collider = Rect{x * size, y * size, size};
 		}
 	};
 	enum mapModes{
@@ -38,9 +41,10 @@ public:
 	void DrawMap(Texture& mapTex, int32 mode);	// draw the map on the screen
 	Array<P2Body> CreateMapCol(P2World& pWorld);	// create colliders for the map
 	void DrawMapCol(Array<P2Body>& mapColArr);	// draw map for debugging
+	Array<Vec2> gimmickPairColPos;
 	Array<Gimmick> CreateMapGimmicks();
 	void UpdateMapGimmicks(Array<Gimmick>& gimmickArr, Array<P2Body>& mapColArr, P2Body& player);
-	void LinkGimmick();
+	void LinkGimmick(Array<Gimmick>& gimmickArr);
 	void ActivateGimmick(Gimmick& gimmick, Array<P2Body>& mapColArr);
 
 private:

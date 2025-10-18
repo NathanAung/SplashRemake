@@ -13,6 +13,7 @@ void Main()
 
 	Array<P2Body> mapColliders = dungeonMap.CreateMapCol(world);
 	Array<DungeonMap::Gimmick> mapGimmicks = dungeonMap.CreateMapGimmicks();
+	dungeonMap.LinkGimmick(mapGimmicks);
 
 
 	// 2D physics simulation step time (seconds)

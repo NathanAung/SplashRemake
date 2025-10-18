@@ -17,7 +17,7 @@ DungeonMap::DungeonMap()
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	7
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	8
 			{0,0,0,0,0,0,0x01000009,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	9
-			{0,0,0,0,0,0x00000101,0x01000104,0x00000101,0x00000101,0x00000101,0x00000101,0,0,0,0,0,0,0,0,0},	//	0
+			{0,0,0,0,0,0x00000101,0x01010104,0x00000101,0x00000101,0x00000101,0x00000101,0,0,0,0,0,0,0,0,0},	//	0
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	1
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	2
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	3
@@ -119,7 +119,7 @@ Array<P2Body> DungeonMap::CreateMapCol(P2World& pWorld)
 					tileCount++;
 				}
 			}
-			else if(tileType == 4 && tileCol == 1){
+			else if(tileStat == 1 && tileCol == 1){
 				if(tileExist){
 					existPos.x += (tileWidth/2) * tileCount;
 					bodies << pWorld.createRect(P2Static, existPos, SizeF{tileWidth * tileCount, tileHeight});
@@ -128,6 +128,7 @@ Array<P2Body> DungeonMap::CreateMapCol(P2World& pWorld)
 					Print << U"body array size " << bodies.size();
 					tileExist = false;
 					tileCount = 0;
+					gimmickPairColPos << Vec2(x, y);
 				}
 				
 				pos.x += tileWidth/2;
@@ -182,9 +183,10 @@ Array<DungeonMap::Gimmick> DungeonMap::CreateMapGimmicks(){
 			Vec2 pos(x * tileWidth, y * tileHeight);
 			int32 tileType = GetTileType(x, y);
 			int32 tileStat = GetTileStat(x, y);
+			int32 tilePairIdx = GetTilePairIdx(x, y);
 			
 			if(tileType == 9){
-				gimmicks << Gimmick(0, pos.x, pos.y, tileWidth);
+				gimmicks << Gimmick(0, x, y, tileWidth, tilePairIdx);
 				Print << U"gimmick placed at " << pos;
 			}
 		}
@@ -201,17 +203,31 @@ void DungeonMap::UpdateMapGimmicks(Array<Gimmick>& gimmickArr, Array<P2Body>& ma
 
 		if(gimmick.collider.intersects(c)){
 			//Print << U"intersecting";
+			
 		}
 
 		//Print << player.getPos().x;
 		//Print << player.getPos().y;
 
-		//gimmick.collider.draw(Palette::Cyan);
-		//c.draw(Palette::Green);
+		gimmick.collider.draw(Palette::Cyan);
+		c.draw(Palette::Green);
 	}
 }
 
 
 void DungeonMap::ActivateGimmick(Gimmick& gimmick, Array<P2Body>& mapColArr){
 	
+}
+
+void DungeonMap::LinkGimmick(Array<Gimmick>& gimmickArr){
+	for(int i = 0; i < gimmickArr.size(); i++){
+		for(int j = 0; j < gimmickPairColPos.size(); j++){
+			int32 tilePairIdx = GetTilePairIdx(gimmickPairColPos[j].x, gimmickPairColPos[j].y);
+			if(gimmickArr[i].pairColIndx == tilePairIdx){
+				gimmickArr[i].pairColX = gimmickPairColPos[j].x;
+				gimmickArr[i].pairColY = gimmickPairColPos[j].y;
+				Print << U"gimmick linked for " << tilePairIdx;
+			}
+		}
+	}
 }
