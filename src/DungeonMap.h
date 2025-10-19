@@ -43,7 +43,8 @@ private:
     static constexpr int Height = 20;
 
     Grid<int32> map;
-    Array<Point> obstaclePositions;
+	Array<Point> obstaclePositions;
+	HashTable<Point, int32> tileToColliderIndex;
 
 	// bit accessors
 	// 00 - 07 bits: sprite index on texture

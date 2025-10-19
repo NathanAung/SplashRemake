@@ -51,7 +51,7 @@ DungeonMap::DungeonMap() {
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	7
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	8
 			{0,0,0,0,0,0,0x01000309,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	9
-			{0,0,0,0,0,0x00000101,0x01000204,0x00000101,0,0,0,0,0,0,0,0,0,0,0,0}, // 0
+			{0,0,0,0x00000101,0x00000101,0x00000101,0x01000204,0x00000101,0x00000101,0,0,0,0,0,0,0,0,0,0,0}, // 0
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	1
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	2
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	3
@@ -65,6 +65,7 @@ DungeonMap::DungeonMap() {
 	};
 }
 
+
 void DungeonMap::Draw(Texture& mapTex) {
     for (int y = 0; y < Height; y++) {
         for (int x = 0; x < Width; x++) {
@@ -76,29 +77,59 @@ void DungeonMap::Draw(Texture& mapTex) {
     }
 }
 
+
 Array<P2Body> DungeonMap::CreateColliders(P2World& world) {
     Array<P2Body> bodies;
+    obstaclePositions.clear();
+    tileToColliderIndex.clear();
 
-    for (int y = 0; y < Height; y++) {
-	    for (int x = 0; x < Width; x++) {
-			const int32 tile = map[y][x];
-			// wall
-			if (GetType(tile) == TileType::wall) {
-                Vec2 pos(x * TileSize + TileSize / 2, y * TileSize + TileSize / 2);
-				bodies << world.createRect(P2Static, pos, SizeF{ TileSize, TileSize });
-				obstaclePositions << Point(x, y);
-			}
-			// obstacle
-			else if (GetType(tile) == TileType::obstacle) {
-				Vec2 pos(x * TileSize + TileSize / 2, y * TileSize + TileSize / 2);
+    for (int y = 0; y < Height; ++y) {
+        int runStart = -1;
+        int runLength = 0;
+
+        for (int x = 0; x <= Width; ++x) {
+            bool isWall = (x < Width && GetType(map[y][x]) == TileType::wall);
+
+            if (isWall) {
+                if (runStart == -1) runStart = x;
+                ++runLength;
+            }
+            else if (runLength > 0) {
+                const double startX = runStart * TileSize;
+                const double width = runLength * TileSize;
+                const double centerX = startX + width / 2;
+                const double centerY = y * TileSize + TileSize / 2;
+
+                int colliderIndex = bodies.size();
+                bodies << world.createRect(P2Static, Vec2(centerX, centerY),
+                                           SizeF{ width, TileSize });
+
+                // Map each tile in this wall run to the same collider index
+                for (int i = 0; i < runLength; ++i) {
+                    Point pos(runStart + i, y);
+                    obstaclePositions << pos;
+                    tileToColliderIndex[pos] = colliderIndex;
+                }
+
+                runStart = -1;
+                runLength = 0;
+            }
+
+            // Handle individual obstacles
+            if (x < Width && GetType(map[y][x]) == TileType::obstacle) {
+                Vec2 pos((x + 0.5) * TileSize, (y + 0.5) * TileSize);
+                int colliderIndex = bodies.size();
                 bodies << world.createRect(P2Static, pos, SizeF{ TileSize, TileSize });
-                obstaclePositions << Point(x, y);
-			}
-		}
+                Point tilePos(x, y);
+                obstaclePositions << tilePos;
+                tileToColliderIndex[tilePos] = colliderIndex;
+            }
+        }
     }
 
     return bodies;
 }
+
 
 Array<DungeonMap::Gimmick> DungeonMap::CreateGimmicks() {
     Array<Gimmick> gimmicks;
@@ -115,18 +146,19 @@ Array<DungeonMap::Gimmick> DungeonMap::CreateGimmicks() {
     return gimmicks;
 }
 
+
 void DungeonMap::LinkGimmicks(Array<Gimmick>& gimmicks) {
     for (auto& gimmick : gimmicks) {
-        for (int i = 0; i < obstaclePositions.size(); ++i) {
-            Point pos = obstaclePositions[i];
+        for (const auto& [pos, colliderIndex] : tileToColliderIndex) {
             if (GetPairID(map[pos.y][pos.x]) == gimmick.pairID) {
-                gimmick.pairIndex = i;
+                gimmick.pairIndex = colliderIndex;
                 gimmick.pairTilePos = pos;
                 break;
             }
         }
     }
 }
+
 
 void DungeonMap::ActivateGimmick(Gimmick& gimmick, Array<P2Body>& colliders) {
     if (gimmick.activated || gimmick.pairIndex < 0 || gimmick.pairIndex >= colliders.size())
@@ -143,6 +175,7 @@ void DungeonMap::ActivateGimmick(Gimmick& gimmick, Array<P2Body>& colliders) {
     gimmick.activated = true;
 }
 
+
 void DungeonMap::UpdateGimmicks(Array<Gimmick>& gimmicks, Array<P2Body>& colliders, const P2Body& player) {
     const Circle playerCircle(player.getPos(), TileSize / 2);
 
@@ -155,8 +188,9 @@ void DungeonMap::UpdateGimmicks(Array<Gimmick>& gimmicks, Array<P2Body>& collide
     }
 }
 
+
 void DungeonMap::DrawColliders(const Array<P2Body>& colliders) {
     for (const auto& body : colliders) {
-        body.draw(ColorF{ 0.8 });
+        body.draw(HSV{ body.id() * 10.0 });
     }
 }
