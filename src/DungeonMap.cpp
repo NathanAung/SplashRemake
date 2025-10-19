@@ -66,6 +66,7 @@ DungeonMap::DungeonMap() {
 }
 
 
+// draw the map on the screen
 void DungeonMap::Draw(Texture& mapTex) {
     for (int y = 0; y < Height; y++) {
         for (int x = 0; x < Width; x++) {
@@ -78,31 +79,35 @@ void DungeonMap::Draw(Texture& mapTex) {
 }
 
 
+// create and group colliders
 Array<P2Body> DungeonMap::CreateColliders(P2World& world) {
     Array<P2Body> bodies;
     obstaclePositions.clear();
     tileToColliderIndex.clear();
 
-    for (int y = 0; y < Height; ++y) {
-        int runStart = -1;
+	for (int y = 0; y < Height; ++y) {
+		// for tracking a run on a wall of tiles
+		int runStart = -1;
         int runLength = 0;
 
-        for (int x = 0; x <= Width; ++x) {
-            bool isWall = (x < Width && GetType(map[y][x]) == TileType::wall);
+		for (int x = 0; x <= Width; ++x) {
+			// check if tile is a wall
+			bool isWall = (x < Width && GetType(map[y][x]) == TileType::wall);
 
-            if (isWall) {
-                if (runStart == -1) runStart = x;
+			if (isWall) {
+				// set index if so, or increase length if start already exists
+				if (runStart == -1) runStart = x;
                 ++runLength;
-            }
-            else if (runLength > 0) {
+			}
+			// place walls when this tile is not wall, but run length is increased
+			else if (runLength > 0) {
                 const double startX = runStart * TileSize;
                 const double width = runLength * TileSize;
                 const double centerX = startX + width / 2;
                 const double centerY = y * TileSize + TileSize / 2;
 
-                int colliderIndex = bodies.size();
-                bodies << world.createRect(P2Static, Vec2(centerX, centerY),
-                                           SizeF{ width, TileSize });
+                int colliderIndex = bodies.size();	// index in the collider array
+                bodies << world.createRect(P2Static, Vec2(centerX, centerY), SizeF{ width, TileSize });
 
                 // Map each tile in this wall run to the same collider index
                 for (int i = 0; i < runLength; ++i) {
@@ -147,6 +152,7 @@ Array<DungeonMap::Gimmick> DungeonMap::CreateGimmicks() {
 }
 
 
+// link gimmicks to corresponding obstacles
 void DungeonMap::LinkGimmicks(Array<Gimmick>& gimmicks) {
     for (auto& gimmick : gimmicks) {
         for (const auto& [pos, colliderIndex] : tileToColliderIndex) {

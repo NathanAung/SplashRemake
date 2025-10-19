@@ -3,7 +3,8 @@
 
 class DungeonMap {
 public:
-    struct Gimmick {
+	// button
+	struct Gimmick {
         int type = 0;
         Point tilePos;
         int pairID = 0;
@@ -33,9 +34,9 @@ public:
     void Draw(Texture& mapTex);
     Array<P2Body> CreateColliders(P2World& world);
     Array<Gimmick> CreateGimmicks();
-    void LinkGimmicks(Array<Gimmick>& gimmicks);
+    void LinkGimmicks(Array<Gimmick>& gimmicks);	// for linking buttons to corresponding obstacles
     void UpdateGimmicks(Array<Gimmick>& gimmicks, Array<P2Body>& colliders, const P2Body& player);
-    void DrawColliders(const Array<P2Body>& colliders);
+    void DrawColliders(const Array<P2Body>& colliders);	// debug
 
 private:
     static constexpr int TileSize = 32;
@@ -43,8 +44,8 @@ private:
     static constexpr int Height = 20;
 
     Grid<int32> map;
-	Array<Point> obstaclePositions;
-	HashTable<Point, int32> tileToColliderIndex;
+	Array<Point> obstaclePositions;	// positions of objects you can collide with
+	HashTable<Point, int32> tileToColliderIndex;	// for mapping collider position and index in collider array
 
 	// bit accessors
 	// 00 - 07 bits: sprite index on texture
