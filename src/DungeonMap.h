@@ -1,59 +1,65 @@
 #pragma once
-# include <Siv3D.hpp> // Siv3D v0.6.16
+#include <Siv3D.hpp> // Siv3D v0.6.16
 
-class DungeonMap
-{
-	Array<Grid<int32>> map;
-	int32 mapLayer;
-
-	
-
-
+class DungeonMap {
 public:
-	struct Gimmick{
-		int type = 0;
-		int colSize = 32;
-		int posX = 0;
-		int posY = 0;
-		bool activated = false;
-		int pairColIndx = 0;
-		int pairColX;
-		int pairColY;
-		
-		Rect collider;
+    struct Gimmick {
+        int type = 0;
+        Point tilePos;
+        int pairID = 0;
+        bool activated = false;
+        int pairIndex = -1;     // index in collider array
+        Point pairTilePos;
+        Rect collider;
 
-		Gimmick(int t, int x, int y, int size, int pairIdx){
-			type = t;
-			posX = x;
-			posY = y;
-			colSize = size;
-			pairColIndx = pairIdx;
-
-			collider = Rect{x * size, y * size, size};
-		}
+        Gimmick(int t, Point pos, int id, int tileSize)
+            : type(t), tilePos(pos), pairID(id), collider(pos.x * tileSize, pos.y * tileSize, tileSize) {}
 	};
-	enum mapModes{
-		bg,
+
+	enum TileType {
 		normal,
-		firstOnly,
+		wall,
+		obstacle,
+		gimmick
 	};
-	DungeonMap();
-	void DrawMap(Texture& mapTex, int32 mode);	// draw the map on the screen
-	Array<P2Body> CreateMapCol(P2World& pWorld);	// create colliders for the map
-	void DrawMapCol(Array<P2Body>& mapColArr);	// draw map for debugging
-	Array<Vec2> gimmickPairColPos;
-	Array<Gimmick> CreateMapGimmicks();
-	void UpdateMapGimmicks(Array<Gimmick>& gimmickArr, Array<P2Body>& mapColArr, P2Body& player);
-	void LinkGimmick(Array<Gimmick>& gimmickArr);
-	void ActivateGimmick(Gimmick& gimmick, Array<P2Body>& mapColArr);
+
+	enum TileStatus {
+		none,
+		activated
+	};
+
+    DungeonMap();
+
+    void Draw(Texture& mapTex);
+    Array<P2Body> CreateColliders(P2World& world);
+    Array<Gimmick> CreateGimmicks();
+    void LinkGimmicks(Array<Gimmick>& gimmicks);
+    void UpdateGimmicks(Array<Gimmick>& gimmicks, Array<P2Body>& colliders, const P2Body& player);
+    void DrawColliders(const Array<P2Body>& colliders);
 
 private:
-	int32 const tileWidth = 32;		// in pixels
-	int32 const tileHeight = 32;
-	int32 mapWidth = 20;	// in tiles
-	int32 mapHeight = 20;
-	int32 GetTileType(int32 x, int32 y);
-	int32 GetTileCol(int32 x, int32 y);
-	int32 GetTileStat(int32 x, int32 y);
-	int32 GetTilePairIdx(int32 x, int32 y);
+    static constexpr int TileSize = 32;
+    static constexpr int Width = 20;
+    static constexpr int Height = 20;
+
+    Grid<int32> map;
+    Array<Point> obstaclePositions;
+
+	// bit accessors
+	// 00 - 07 bits: sprite index on texture
+	static int GetSprite(int32 value) { return (value & 0xFF); }
+	// 08 - 15 bits: type: 0 - normal, 1 - wall, 2 - obstacle, 3 - gimmick
+	static int GetType(int32 value) { return (value >> 8) & 0xFF; }
+	// 16 - 23 bits: status: 0 - none, 1 - activated
+	static int GetStatus(int32 value) { return (value >> 16) & 0xFF; }
+	// 24 - 31 bits: pair index for linking gimmicks and obstacles  
+    static int GetPairID(int32 value) { return (value >> 24) & 0xFF; }
+
+	// corresponding setters
+	static void SetSprite(int32& value, int idx) { value = (value & ~0xFF) | (idx & 0xFF); }
+    static void SetType(int32& value, int idx) { value = (value & ~(0xFF << 8)) | ((idx & 0xFF) << 8); }
+    static void SetStatus(int32& value, int idx) { value = (value & ~(0xFF << 16)) | ((idx & 0xFF) << 16); }
+    static void SetPairID(int32& value, int idx) { value = (value & ~(0xFF << 24)) | ((idx & 0xFF) << 24); }
+
+    void ActivateGimmick(Gimmick& gimmick, Array<P2Body>& colliders);
 };
