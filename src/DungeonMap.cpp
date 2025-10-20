@@ -3,8 +3,8 @@
 /*
 	MAP TILE DATA:
 	00 - 07 bits: sprite index on texture
-	08 - 15 bits: type: 0 - normal, 1 - wall, 2 - obstacle, 3 - gimmick
-	16 - 23 bits: status: 0 - none, 1 - activated
+	08 - 15 bits: type: 0 - normal, 1 - wall, 2 - obstacle, 3 - gimmick, 4 - vent, 5 - trap, 6 - enemy
+	16 - 23 bits: status: 0 - none, 1 - activated| for enemies, enemy types: 0 - melee, 2 - magic, 3 - flying
 	24 - 31 bits: pair index for linking gimmicks and obstacles  
 */
 
@@ -50,8 +50,8 @@ DungeonMap::DungeonMap() {
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	6
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	7
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	8
-			{0,0,0,0,0,0,0x01000309,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	9
-			{0,0,0,0x00000101,0x00000101,0x00000101,0x01000204,0x00000101,0x00000101,0,0,0,0,0,0,0,0,0,0,0}, // 0
+			{0,0,0,0x0000060B,0,0,0x01000309,0,0x0000050A,0,0,0,0,0,0,0,0,0,0,0},	//	9
+			{0,0,0x00000406,0x00000101,0x00000101,0x00000101,0x01000204,0x00000101,0x00000101,0,0,0,0,0,0,0,0,0,0,0}, // 0
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	1
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	2
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},	//	3
@@ -151,6 +151,68 @@ Array<DungeonMap::Gimmick> DungeonMap::CreateGimmicks() {
     return gimmicks;
 }
 
+Array<DungeonMap::Vent> DungeonMap::CreateVents() {
+	Array<Vent> vents;
+
+	for (int y = 0; y < Height; y++) {
+		for (int x = 0; x < Width; x++) {
+			const int32 tile = map[y][x];
+			if (GetType(tile) == TileType::vent) {
+				vents << Vent(Point(x, y), TileSize);
+				Print << U"Vent created at (" << x << U"," << y << U")";
+			}
+		}
+	}
+
+	return vents;
+}
+
+
+Array<DungeonMap::Trap> DungeonMap::CreateTraps() {
+	Array<Trap> traps;
+
+	for (int y = 0; y < Height; y++) {
+		for (int x = 0; x < Width; x++) {
+			const int32 tile = map[y][x];
+			if (GetType(tile) == TileType::trap) {
+				traps << Trap(GetType(tile), Point(x, y), TileSize);
+				Print << U"Trap created at (" << x << U"," << y << U")";
+			}
+		}
+	}
+
+	return traps;
+}
+
+
+// Placeholder for enemy creation logic
+Array<int> DungeonMap::CreateEnemies() {
+	Array<int> enemies; // Replace int with actual Enemy class when implemented
+
+	for(int y = 0; y < Height; y++) {
+		for (int x = 0; x < Width; x++) {
+			const int32 tile = map[y][x];
+			if (GetType(tile) == TileType::enemy) {
+				// Create enemy based on type and position
+				if(GetStatus(tile) == 0) {
+					// Melee enemy
+					Print << U"Creating Melee enemy at (" << x << U"," << y << U")";
+				}
+				else if (GetStatus(tile) == 1) {
+					// Magic enemy
+					Print << U"Creating Magic enemy at (" << x << U"," << y << U")";
+				}
+				else if (GetStatus(tile) == 2) {
+					// Flying enemy
+					Print << U"Creating Flying enemy at (" << x << U"," << y << U")";
+				}
+				enemies << tile; // Placeholder: store tile info, replace with actual enemy object
+			}
+		}
+	}
+	return enemies;
+}
+
 
 // link gimmicks to corresponding obstacles
 void DungeonMap::LinkGimmicks(Array<Gimmick>& gimmicks) {
@@ -192,6 +254,34 @@ void DungeonMap::UpdateGimmicks(Array<Gimmick>& gimmicks, Array<P2Body>& collide
         // visualize gimmick
         //gimmick.collider.draw(gimmick.activated ? Palette::Gray : Palette::Cyan);
     }
+}
+
+void DungeonMap::UpdateVents(const Array<Vent>& vents, P2Body& player) {
+	const Circle playerCircle(player.getPos(), TileSize / 2);
+
+	for (const auto& vent : vents) {
+		if (vent.collider.intersects(playerCircle)) {
+			Print << U"Player near vent at " << vent.tilePos;
+			// Handle vent effect here (e.g., play sound, trigger animation)
+
+		}
+		// visualize vent
+		//vent.collider.draw(Palette::Blue);
+	}
+}
+
+
+void DungeonMap::UpdateTraps(const Array<Trap>& traps, const P2Body& player) {
+	const Circle playerCircle(player.getPos(), TileSize / 2);
+
+	for (const auto& trap : traps) {
+		if (trap.collider.intersects(playerCircle)) {
+			Print << U"Player triggered trap at " << trap.tilePos;
+			// Handle trap effect here (e.g., reduce health)
+		}
+		// visualize trap
+		//trap.collider.draw(Palette::Red);
+	}
 }
 
 

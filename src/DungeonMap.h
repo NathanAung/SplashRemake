@@ -17,11 +17,31 @@ public:
             : type(t), tilePos(pos), pairID(id), collider(pos.x * tileSize, pos.y * tileSize, tileSize) {}
 	};
 
+	struct Vent {
+		Point tilePos;
+		Rect collider;
+
+		Vent(Point pos, int tileSize)
+			: tilePos(pos), collider(pos.x * tileSize, pos.y * tileSize, tileSize) {}
+	};
+
+	struct Trap {
+		int type = 0;
+		Point tilePos;
+		Rect collider;
+
+		Trap(int t, Point pos, int tileSize)
+			: type(t), tilePos(pos), collider(pos.x * tileSize, pos.y * tileSize, tileSize) {}
+	};
+
 	enum TileType {
 		normal,
 		wall,
 		obstacle,
-		gimmick
+		gimmick,
+		vent,
+		trap,
+		enemy
 	};
 
 	enum TileStatus {
@@ -31,12 +51,26 @@ public:
 
     DungeonMap();
 
-    void Draw(Texture& mapTex);
-    Array<P2Body> CreateColliders(P2World& world);
-    Array<Gimmick> CreateGimmicks();
+	// map general
+	void Draw(Texture& mapTex);
+	Array<P2Body> CreateColliders(P2World& world);
+	void DrawColliders(const Array<P2Body>& colliders);	// debug
+	
+	// gimmicks
+	Array<Gimmick> CreateGimmicks();
     void LinkGimmicks(Array<Gimmick>& gimmicks);	// for linking buttons to corresponding obstacles
     void UpdateGimmicks(Array<Gimmick>& gimmicks, Array<P2Body>& colliders, const P2Body& player);
-    void DrawColliders(const Array<P2Body>& colliders);	// debug
+
+	// vents
+	Array<Vent> CreateVents();
+	void UpdateVents(const Array<Vent>& vents, P2Body& player);
+
+	// traps
+	Array<Trap> CreateTraps();
+	void UpdateTraps(const Array<Trap>& traps, const P2Body& player);
+
+	// enemies
+	Array<int> CreateEnemies();	// placeholder
 
 private:
     static constexpr int TileSize = 32;
@@ -50,9 +84,10 @@ private:
 	// bit accessors
 	// 00 - 07 bits: sprite index on texture
 	static int GetSprite(int32 value) { return (value & 0xFF); }
-	// 08 - 15 bits: type: 0 - normal, 1 - wall, 2 - obstacle, 3 - gimmick
+	// 08 - 15 bits: type: 0 - normal, 1 - wall, 2 - obstacle, 3 - gimmick, 4 - vent, 5 - trap, 6 - enemy
 	static int GetType(int32 value) { return (value >> 8) & 0xFF; }
-	// 16 - 23 bits: status: 0 - none, 1 - activated
+	// 16 - 23 bits: status: 0 - none, 1 - activated, 
+	// for enemies, enemy types: 0 - melee, 2 - magic, 3 - flying
 	static int GetStatus(int32 value) { return (value >> 16) & 0xFF; }
 	// 24 - 31 bits: pair index for linking gimmicks and obstacles  
     static int GetPairID(int32 value) { return (value >> 24) & 0xFF; }
