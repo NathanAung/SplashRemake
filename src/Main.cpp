@@ -1,99 +1,57 @@
 ﻿# include <Siv3D.hpp>
-# include "Title.h"
-# include "Game.h"
-
-#if true 
-
+# include "Enemy.h"
+# include "MeleeEnemy.h"
 
 void Main()
 {
-	Scene::SetBackground(ColorF{ 0.8, 0.9, 1.0 });
-
-	const Texture texture{ U"Assets/Sprites/Player/pg_idle.png" };
-	constexpr int32 patterns[4] = { 1, 2, 1, 0 };
-	double timer = 0.0;
-	int32 x = 0;
-	int32 y = 0;
-
-	while (System::Update())
-	{
-		const ScopedRenderStates2D sampler{ SamplerState::ClampNearest };
-
-		/*
-		const uint64 t = Time::GetMillisec();
-		const int32 x = ((t / 2000 % 1) * 5);
-		const int32 y = (t / 4000 % 4);
-		const int32 n = (t / 250 % 4);
-		*/
-		
-
-		
-		timer += Scene::DeltaTime();
-		if(timer > 0.1){
-			x++;
-			timer = 0.0;
-		}
-
-		if(x == 5){
-			x = 0;
-			y++;
-		}
-		if(y == 5){
-			y = 0;
-		}
-		if(y == 4 && x == 4){
-			x = 0;
-			y++;
-		}
-
-		
-
-		Rect{ (x * 77), (y * 77), (77), (77) }
-		.draw(ColorF{ 0.3, 0.9, 0.8 });
-
-		texture.scaled(0.2).draw();
-
-		Rect{ 400, 100, 384, 384 }
-			.draw(ColorF{ 0.5, 0.9, 0.5 });
-
-		texture((x * 384), (y * 384), 384, 384)
-			.scaled(1).draw(400, 100);
-
-		//texture()
-
-		
-	}
-}
-
-
-#else
-
-using App = SceneManager<String>;
-
-void Main()
-{
-	Window::SetTitle(U"兵士はつらいよ");
 	Window::Resize(1280, 720);
 
-	FontAsset::Register(U"TitleFont", FontMethod::MSDF, 48, Typeface::Bold);
+	TextureAsset::Register(U"test",U"Assets/Sprites/Enemy/Melee/enemySprite.png");
 
-	// Create scene manager
-	App manager;
+	// 2D physics simulation step time (seconds)
+	double StepTime = (1.0 / 200.0);
 
-	manager.add<Title>(U"Title");
-	manager.add<Game>(U"Game");
+	// 2D physics simulation accumulated time (seconds)
+	double accumulatedTime = 0.0;
 
-	manager.setFadeColor(ColorF{ 0.8, 0.9, 1.0 });
+	// 2D physics world
+	P2World world;
 
-	manager.init(U"Title", 0.75s);
+	const P2Body ground = world.createRect(P2Static, Vec2{ 200, 200 }, SizeF{ 1000, 10 });
+
+	// Create 3 bodies (circles with radius 10cm)
+	Array<MeleeEnemy> enemies;
+	enemies << MeleeEnemy(&world, U"test", Vec2{ 200, -600 }, 50);
+
+	// 2D camera (center coordinates (0, -300), zoom 1.0)
+	Camera2D camera{ Vec2{ 200, 200 }, 1.5 };
 
 	while (System::Update())
 	{
-		if (not manager.update())
+
+		for (accumulatedTime += Scene::DeltaTime(); StepTime <= accumulatedTime; accumulatedTime -= StepTime)
 		{
-			break;
+			world.update(StepTime);
+			for (auto& enemy : enemies)
+			{
+				enemy.Update(StepTime);
+			}
 		}
+
+		camera.update();
+		{
+			const auto t = camera.createTransformer();
+			
+			ground.draw(Palette::Gray);
+
+			for (auto& enemy : enemies)
+			{
+				enemy.Draw();
+			}
+		
+			
+		}
+		
+		
 	}
 }
-
-#endif
