@@ -2,32 +2,40 @@
 
 # include <Siv3D.hpp>
 
+enum State{
+		None,		// 例外用
+		Solid,		// 固体
+		Liquid,		// 液体
+		Gas,		// 気体
+	};
+
 class PlayerController{
 private:
-	enum State{
-			None,		// 例外用
-			Solid,		// 固体
-			Liquid,		// 液体
-			Gas,		// 気体
-		};
-	const double m_moveSpeed = 300;		// 液体時：移動速度
-	const double m_addForceOnSolid = 450;	// 固体時：横移動加速度
-	const double m_floatSpeed = 200;	// 気体時：上昇速度
-	const double m_maxHP = 100;			// 最大HP
+	const double m_moveSpeed = 300;				// 液体時：移動速度
+	const double m_addForceOnSolid = 450;		// 固体時：横移動加速度
+	const double m_floatSpeed = 200;			// 気体時：上昇速度
+	const double m_maxHP = 100;					// 最大HP
+	const double m_maxEP = 100;					// 最大EP
+	const double m_epDecreaseSpeedPerSec = 20;	// EPの減少速度
+	const double m_epIncreaseSpeedPerSec = 5;	// EPの上昇速度
 	const Size m_collSize{ 100, 100 };	// 当たり判定のサイズ
-	P2World* m_world;		// P2ワールド
-	P2Body m_collider;		// 物理物体の当たり判定
-	// 液体時のテクスチャ
 	const Texture m_textureLiquid{ U"../App/Assets/Sprites/Player/pl_idle.png" };
+	const int m_liquidCellSize = 960;
 	// 固体時のテクスチャ
 	const Texture m_textureSolid{ U"../App/Assets/Sprites/Player/ps_move.png" };
+	const int m_solidCellSize = 1920;
 	// 気体時のテクスチャ
 	const Texture m_textureGas{ U"../App/Assets/Sprites/Player/pg_idle.png" };
+	const int m_gasCellSize = 384;
+	P2Body m_collider;		// 物理物体の当たり判定
+	// 液体時のテクスチャ
 	Texture m_sprite;				// 現在のスプライト
 	State m_state;
 	bool m_flipSprite = false;		// スプライトを反転するか
+	double m_hp = m_maxHP;			// 現在のHP
+	double m_ep = m_maxEP;			// 現在のEP
 
-	void MoveHorizontal(Vec2* velocity);
+	void MoveHorizontal(Vec2 velocity);
 
 	void ChangeLiquid();
 
@@ -44,9 +52,17 @@ public:
 
 	~PlayerController();
 
-	void Update();
+	void Update(double deltaTime);
 
 	void Draw();
 
+	State GetState();
+
 	P2Body* GetBody();
+
+	double HP();
+
+	void OnDamage(double damage);
+
+	double EP();
 };
