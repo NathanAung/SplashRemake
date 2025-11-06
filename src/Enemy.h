@@ -9,6 +9,7 @@ protected:
 	Vec2 startPos;
 	double pathSize;
 	double fwdDirection = 1.0;
+	bool stopMove = false;
 
 	Texture sprite;
 
@@ -43,10 +44,13 @@ void Enemy::Update(const double& deltaTime){
 	if(body.getPos().x < startPos.x - pathSize)
 		fwdDirection = 1.0;
 		
-	if(Math::Abs(body.getVelocity().x) > 10.0)
-		body.setVelocity({50.0 * Math::Sign(fwdDirection) ,body.getVelocity().y});
+	
+	body.setVelocity({ Math::Clamp(body.getVelocity().x, -50, 50) ,body.getVelocity().y});
 
-	body.applyForce(Vec2{ 100.0 * fwdDirection , 0.0 } * deltaTime);
+	if(!stopMove)
+		body.applyForce(Vec2{ 500.0 * fwdDirection , 0.0 } * deltaTime);
+	else
+		body.setVelocity({0.0,0.0});
 
 	if(PlayerDetected()){
 		Attack();

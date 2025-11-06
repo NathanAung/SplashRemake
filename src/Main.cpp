@@ -22,6 +22,7 @@ void Main()
 	// Create 3 bodies (circles with radius 10cm)
 	Array<MeleeEnemy> enemies;
 	enemies << MeleeEnemy(&world, U"test", Vec2{ 200, -600 }, 50);
+	enemies << MeleeEnemy(&world, U"test", Vec2{ 0, -600 }, 100);
 
 	// 2D camera (center coordinates (0, -300), zoom 1.0)
 	Camera2D camera{ Vec2{ 200, 200 }, 1.5 };

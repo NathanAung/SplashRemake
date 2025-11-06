@@ -35,7 +35,7 @@ void MeleeEnemy::Update(const double& deltaTime) {
 
 void MeleeEnemy::Draw(){
 	//Enemy::Draw();
-	playerTrigger.draw();
+	//playerTrigger.draw(Palette::Greenyellow);
 
 	const uint64 t = Time::GetMillisec();
 	const int32 x = (t / 150 % 4);
@@ -48,13 +48,15 @@ void MeleeEnemy::Draw(){
 
 bool MeleeEnemy::PlayerDetected() {
 
-	if(Key0.down()){
+	if(Key0.pressed()){ //intersect player as : playerTrigger.intersects(player.collider)
+		stopMove = true;
 		return true;
 	}
 
+	stopMove = false;
 	return false;
 }
 
 void MeleeEnemy::Attack() {
-	Print << U"ATTACK";
+	//Print << U"ATTACK";
 }
