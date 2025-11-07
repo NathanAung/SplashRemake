@@ -39,6 +39,8 @@ void Main()
 		ClearPrint();
 		// Print << U"bodies.size(): " << bodies.size() << U"\n";
 
+
+		// Update Loop
 		for (accumulatedTime += Scene::DeltaTime(); StepTime <= accumulatedTime; accumulatedTime -= StepTime)
 		{
 			// 2D 物理演算のワールドを StepTime 秒進める
@@ -53,8 +55,23 @@ void Main()
 			// bodies.remove_if([](const P2Body& body) { return (500 < body.getPos().y); });
 		}
 		m_player.Update(StepTime);
+
+
+		// Draw
 		camera.Update();
-		camera.Draw(grounds);
+		{
+			const Transformer2D ct = camera.CreateTrans();
+			m_player.Draw();
+			for (const auto& field : grounds)
+			{
+				field.draw();
+			}
+
+			for (auto& enemy : enemies)
+			{
+				enemy.Draw();
+			}
+		}
 		
 			
 	}

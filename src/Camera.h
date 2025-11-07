@@ -18,4 +18,6 @@ public:
 	void Update();
 
 	void Draw(Array<P2Body> fields);
+
+	Transformer2D CreateTrans(); // Create a Constant Tranfrom Reference
 };

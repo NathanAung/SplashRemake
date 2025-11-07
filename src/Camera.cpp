@@ -30,3 +30,7 @@ void Camera::Draw(Array<P2Body> fields)
 	}
 	m_camera.draw();
 }
+
+Transformer2D Camera::CreateTrans(){
+	return m_camera.createTransformer();
+}
