@@ -73,7 +73,7 @@ void DungeonMap::Draw(Texture& mapTex) {
             const int32 tile = map[y][x];
             int sprite = GetSprite(tile);
             Vec2 pos(x * TileSize, y * TileSize);
-            mapTex(sprite * TileSize, 0, TileSize, TileSize).draw(pos);
+            mapTex(sprite * SpriteTileSize, 0, SpriteTileSize, SpriteTileSize).scaled(0.5).draw(pos);
         }
     }
 }

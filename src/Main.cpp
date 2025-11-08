@@ -2,12 +2,14 @@
 # include "Camera.h"
 # include "Enemy.h"
 # include "MeleeEnemy.h"
+# include "DungeonMap.h"
 
 void Main()
 {
 	Window::Resize(1280, 720);
 
 	TextureAsset::Register(U"test",U"Assets/Sprites/Enemy/Melee/enemySprite.png");
+	Texture mapTex(U"Assets/Tiles/basicTile.png");
 
 	// 2D 物理演算のシミュレーションステップ（秒）
 	constexpr double StepTime = (1.0 / 200.0);
@@ -17,6 +19,19 @@ void Main()
 
 	// 2D 物理演算のワールド
 	P2World world;
+
+	DungeonMap dungeon;
+
+    Array<P2Body> colliders = dungeon.CreateColliders(world);
+    Array<DungeonMap::Gimmick> gimmicks = dungeon.CreateGimmicks();
+	dungeon.LinkGimmicks(gimmicks);
+
+	Array<DungeonMap::Vent> vents = dungeon.CreateVents();
+
+	Array<DungeonMap::Trap> traps = dungeon.CreateTraps();
+
+	//Array<int> enemies = dungeon.CreateEnemies();	// placeholder
+
 
 	constexpr Vec2 m_firstPos{ 0, 0 };
 
@@ -45,6 +60,12 @@ void Main()
 		{
 			// 2D 物理演算のワールドを StepTime 秒進める
 			world.update(StepTime);
+
+			
+			//dungeon.UpdateGimmicks(gimmicks, colliders, player);
+			//dungeon.UpdateVents(vents, player);
+			//dungeon.UpdateTraps(traps, player);
+
 			for (auto& enemy : enemies)
 			{
 				enemy.Update(StepTime);
@@ -61,6 +82,9 @@ void Main()
 		camera.Update();
 		{
 			const Transformer2D ct = camera.CreateTrans();
+
+			dungeon.Draw(mapTex);
+        	dungeon.DrawColliders(colliders);
 			
 			for (const auto& field : grounds)
 			{
