@@ -84,7 +84,7 @@ void Main()
 			const Transformer2D ct = camera.CreateTrans();
 
 			dungeon.Draw(mapTex);
-        	dungeon.DrawColliders(colliders);
+        	//dungeon.DrawColliders(colliders);
 			
 			for (const auto& field : grounds)
 			{

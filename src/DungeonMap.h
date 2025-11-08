@@ -75,8 +75,8 @@ public:
 private:
     static constexpr int TileSize = 200;
 	static constexpr int SpriteTileSize = 400;
-    static constexpr int Width = 20;
-    static constexpr int Height = 20;
+    static constexpr int Width = 32;
+    static constexpr int Height = 10;
 
     Grid<int32> map;
 	Array<Point> obstaclePositions;	// positions of objects you can collide with
