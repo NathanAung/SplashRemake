@@ -25,7 +25,7 @@ void IceBullete::Update(double deltaTime)
 void IceBullete::Draw()
 {
 	if (!m_isActive) return;
-	m_collider.draw(Palette::Aliceblue);
+	// m_collider.draw(Palette::Aliceblue);
 	m_sprite.drawAt(m_position);
 }
 

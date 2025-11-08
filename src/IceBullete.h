@@ -22,8 +22,8 @@ private:
 	// 氷攻撃のテクスチャ
 	const Texture m_textureIceAttack{ U"../App/Assets/Sprites/Player/Icicle/icicle.png" };
 	const int m_iceAttackCellSize = 400;
-	const double m_moveSpeed = 500.0;
-	const double m_lifeTime = 1;
+	const double m_moveSpeed = 600.0;
+	const double m_lifeTime = 3;
 	double m_currentTime = 0;
 	bool m_isActive;
 	TextureRegion m_sprite;
