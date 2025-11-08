@@ -20,20 +20,29 @@ private:
 	const double m_epIncreaseSpeedPerSec = 5;	// EPの上昇速度
 	const Size m_collSize{ 100, 100 };	// 当たり判定のサイズ
 	const Texture m_textureLiquid{ U"../App/Assets/Sprites/Player/pl_idle.png" };
-	const int m_liquidCellSize = 960;
+	const int m_liquidCellSize = 480;
+
 	// 固体時のテクスチャ
 	const Texture m_textureSolid{ U"../App/Assets/Sprites/Player/ps_move.png" };
-	const int m_solidCellSize = 1920;
+	const int m_solidCellSize = 480;
+
 	// 気体時のテクスチャ
 	const Texture m_textureGas{ U"../App/Assets/Sprites/Player/pg_idle.png" };
 	const int m_gasCellSize = 384;
 	P2Body m_collider;		// 物理物体の当たり判定
+
 	// 液体時のテクスチャ
 	Texture m_sprite;				// 現在のスプライト
 	State m_state;
 	bool m_flipSprite = false;		// スプライトを反転するか
 	double m_hp = m_maxHP;			// 現在のHP
 	double m_ep = m_maxEP;			// 現在のEP
+
+	// UI系
+	Rect hpBar{20,20,300,30};
+	Rect hpBarBg{20,20,300,30};
+	Rect epBar{20,80,300,30};
+	Rect epBarBg{20,80,300,30};
 
 	void MoveHorizontal(Vec2 velocity);
 
@@ -56,9 +65,13 @@ public:
 
 	void Draw();
 
+	void DrawUI();
+
 	State GetState();
 
 	P2Body* GetBody();
+
+	Circle GetCollider();
 
 	double HP();
 

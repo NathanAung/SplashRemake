@@ -100,6 +100,7 @@ PlayerController::PlayerController(P2World* world, Vec2 firstPos)
 	m_sprite = m_textureLiquid;
 	m_collider = world->createRect(P2Dynamic, firstPos, m_collSize, P2Material{ 1.0f, 0, 0, 1.0f});
 	m_collider.setFixedRotation(true);
+
 }
 
 PlayerController::~PlayerController()
@@ -117,8 +118,8 @@ void PlayerController::Update(double deltaTime)
 	}
 	else
 		m_ep = Min(m_ep + deltaTime * m_epIncreaseSpeedPerSec, m_maxEP);
-	Print << U"State " << m_state << U"\n";
-	Print << U"EP： " << m_ep << U"\n";
+	//Print << U"State " << m_state << U"\n";
+	//Print << U"EP： " << m_ep << U"\n";
 	if (m_collider.getVelocity().x > 0)
 		m_flipSprite = false;
 	else if (m_collider.getVelocity().x < 0)
@@ -129,21 +130,33 @@ void PlayerController::Update(double deltaTime)
 
 void PlayerController::Draw()
 {
+	const uint64 t = Time::GetMillisec();
+	int32 x = (t / 120 % 5);
+	int32 y = 0;
+
+	//const int32 a = (Key9.pressed() ? 2 : 0); // select sprite stage
+	
+
 	int cellSize = 0;
 	switch (m_state){
 		case Liquid:
+			y = (t / 600 % 3);
 			cellSize = m_liquidCellSize;
 			break;
 		case Solid:
+			x = (KeyD.pressed() | KeyA.pressed() ? x : 0);
 			cellSize = m_solidCellSize;
 			break;
 		case Gas:
+			y = (t / 600 % 4);
 			cellSize = m_gasCellSize;
 			break;
 		default:
 			break;
 	}
-	m_sprite(0, 0, cellSize, cellSize).resized(200).mirrored(m_flipSprite).drawAt(m_collider.getPos());
+	m_sprite(cellSize * x, cellSize * y, cellSize, cellSize).resized(200).mirrored(m_flipSprite).drawAt(m_collider.getPos());
+
+	//m_collider.draw();
 }
 
 State PlayerController::GetState()
@@ -164,9 +177,24 @@ double PlayerController::HP()
 void PlayerController::OnDamage(double damage)
 {
 	m_hp = Max(m_hp - damage, 0.0);
+	//Print << U"OUTCH!";
 }
 
 double PlayerController::EP()
 {
     return m_ep;
+}
+
+Circle PlayerController::GetCollider() {
+	return Circle{m_collider.getPos(),m_collSize.x};
+}
+
+void PlayerController::DrawUI() {
+	
+
+	hpBarBg.draw(Palette::Darkolivegreen);
+	hpBar.setSize((m_hp / m_maxHP) * 300,30).draw(Palette::Greenyellow);
+	
+	epBarBg.draw(Palette::Midnightblue);
+	epBar.setSize((m_ep / m_maxEP) * 300,30).draw(Palette::Royalblue);
 }
