@@ -1,7 +1,7 @@
 ﻿#include <Siv3D.hpp>
 #include "DungeonMap.h"
 
-void Main() {
+void MainZ() {
     Window::Resize(640, 640);
     Texture mapTex(U"map.png");
 
