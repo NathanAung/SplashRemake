@@ -10,6 +10,7 @@ void Main()
 
 	TextureAsset::Register(U"test",U"Assets/Sprites/Enemy/Melee/enemySprite.png");
 	Texture mapTex(U"Assets/Tiles/basicTile.png");
+	Texture bgTex(U"Assets/Tiles/Background.png");
 
 	// 2D 物理演算のシミュレーションステップ（秒）
 	constexpr double StepTime = (1.0 / 200.0);
@@ -33,18 +34,16 @@ void Main()
 	//Array<int> enemies = dungeon.CreateEnemies();	// placeholder
 
 
-	constexpr Vec2 m_firstPos{ 0, 0 };
+	constexpr Vec2 m_firstPos{ 3600, 500 };
 
 	PlayerController m_player(&world, m_firstPos);
 	Camera camera{&m_player, Vec2{0, 0}, Vec2{0, -300}, 0.5};
 	// 地面
-	Array<P2Body> grounds;
-	grounds << world.createRect(P2Static, Vec2{ m_firstPos.x, m_firstPos.y + 300 }, SizeF{ 2000, 20 });
-	grounds << world.createRect(P2Static, Vec2{ m_firstPos.x, m_firstPos.y + 100 }, SizeF{ 100, 20 });
+	
 
 	Array<MeleeEnemy> enemies;
-	enemies << MeleeEnemy(&world, U"test", Vec2{ 400, -600 }, 300, &m_player);
-	enemies << MeleeEnemy(&world, U"test", Vec2{ -100, -600 }, 300, &m_player);
+	enemies << MeleeEnemy(&world, U"test", Vec2{ 4000, 800 }, 300, &m_player);
+	enemies << MeleeEnemy(&world, U"test", Vec2{ 5000, 800 }, 300, &m_player);
 
 	// grounds << world.createLine(P2Static, Vec2{ 0, 0 }, Line{ -500, -150, -300, -50 });
 	// grounds << world.createLineString(P2Static, Vec2{ 0, 0 }, LineString{ Vec2{ 100, -50 }, Vec2{ 200, -50 }, Vec2{ 600, -150 } });
@@ -79,17 +78,13 @@ void Main()
 		
 
 		// Draw
+		bgTex.drawAt(-200,500);
 		camera.Update();
 		{
 			const Transformer2D ct = camera.CreateTrans();
 
 			dungeon.Draw(mapTex);
         	//dungeon.DrawColliders(colliders);
-			
-			for (const auto& field : grounds)
-			{
-				field.draw();
-			}
 
 			for (auto& enemy : enemies)
 			{

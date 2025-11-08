@@ -92,6 +92,8 @@ void PlayerController::Input()
 		ChangeSolid();
 	else if (Key3.down())
 		ChangeGas();
+	if (MouseL.down() || KeySpace.down())
+		Shot();
 }
 
 PlayerController::PlayerController(P2World* world, Vec2 firstPos)
@@ -126,6 +128,17 @@ void PlayerController::Update(double deltaTime)
 		m_flipSprite = true;
 	// Float(m_collider.getVelocity());
 	Input();
+
+	if (m_iceBulletes.isEmpty()) return;
+
+    for (auto& bullet : m_iceBulletes){
+        bullet->Update(deltaTime);
+
+        // 非アクティブ化した弾を配列から削除
+        if(!bullet->IsActive()){
+            m_iceBulletes.remove(bullet);
+        }
+    }
 }
 
 void PlayerController::Draw()
@@ -156,6 +169,12 @@ void PlayerController::Draw()
 	}
 	m_sprite(cellSize * x, cellSize * y, cellSize, cellSize).resized(200).mirrored(m_flipSprite).drawAt(m_collider.getPos());
 
+
+	if (m_iceBulletes.isEmpty()) return;
+
+    for (auto& bullet : m_iceBulletes){
+        bullet->Draw();
+    }
 	//m_collider.draw();
 }
 
@@ -197,4 +216,27 @@ void PlayerController::DrawUI() {
 	
 	epBarBg.draw(Palette::Midnightblue);
 	epBar.setSize((m_ep / m_maxEP) * 300,30).draw(Palette::Royalblue);
+}
+
+Array<IceBullete*>* PlayerController::GetBullets()
+{
+    return &m_iceBulletes;
+}
+
+void PlayerController::Shot()
+{
+	if (m_state != Solid) return;
+	// m_ep -= 5;
+	// すでに発射済みで非アクティブ化している球がある場合それを再利用
+	if (!m_iceBulletes.isEmpty()){
+		for (auto& bullet : m_iceBulletes){
+			if (!bullet->IsActive()){
+				bullet->Init(m_collider.getPos(), m_flipSprite ? Vec2{-1,0} : Vec2{1,0});
+				return;
+			}
+		}
+	}
+	// ない場合、新たに生成
+	IceBullete* bullet = new IceBullete{ m_collider.getPos(), m_flipSprite ? Vec2{-1,0} : Vec2{1,0} };
+	m_iceBulletes << bullet;
 }
