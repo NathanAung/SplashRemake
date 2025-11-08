@@ -1,6 +1,7 @@
 #pragma once
 
 # include <Siv3D.hpp>
+# include "IceBullete.h"
 
 enum State{
 		None,		// 例外用
@@ -27,6 +28,7 @@ private:
 	// 気体時のテクスチャ
 	const Texture m_textureGas{ U"../App/Assets/Sprites/Player/pg_idle.png" };
 	const int m_gasCellSize = 384;
+	Array<IceBullete*> m_iceBulletes;
 	P2Body m_collider;		// 物理物体の当たり判定
 	// 液体時のテクスチャ
 	Texture m_sprite;				// 現在のスプライト
@@ -42,6 +44,8 @@ private:
 	void ChangeSolid();
 
 	void ChangeGas();
+
+	void Shot();
 
 	void Float(Vec2 velocity);
 
@@ -65,4 +69,6 @@ public:
 	void OnDamage(double damage);
 
 	double EP();
+
+	Array<IceBullete*>* GetBullets();
 };

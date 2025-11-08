@@ -77,6 +77,24 @@ void PlayerController::ChangeGas()
 	m_sprite = m_textureGas;
 }
 
+void PlayerController::Shot()
+{
+	if (m_state != Solid) return;
+	// m_ep -= 5;
+	// すでに発射済みで非アクティブ化している球がある場合それを再利用
+	if (!m_iceBulletes.isEmpty()){
+		for (auto& bullet : m_iceBulletes){
+			if (!bullet->IsActive()){
+				bullet->Init(m_collider.getPos(), m_flipSprite ? Vec2{-1,0} : Vec2{1,0});
+				return;
+			}
+		}
+	}
+	// ない場合、新たに生成
+	IceBullete* bullet = new IceBullete{ m_collider.getPos(), m_flipSprite ? Vec2{-1,0} : Vec2{1,0} };
+	m_iceBulletes << bullet;
+}
+
 void PlayerController::Float(Vec2 velocity)
 {
 	if (m_state != Gas) return;
@@ -92,6 +110,9 @@ void PlayerController::Input()
 		ChangeSolid();
 	else if (Key3.down())
 		ChangeGas();
+	if (MouseL.down() || KeySpace.down()){
+		Shot();
+	}
 }
 
 PlayerController::PlayerController(P2World* world, Vec2 firstPos)
@@ -104,7 +125,10 @@ PlayerController::PlayerController(P2World* world, Vec2 firstPos)
 
 PlayerController::~PlayerController()
 {
-
+	// 生成したすべての球を破棄する
+    for (auto& bullet : m_iceBulletes){
+        delete bullet;
+    }
 }
 
 void PlayerController::Update(double deltaTime)
@@ -125,6 +149,18 @@ void PlayerController::Update(double deltaTime)
 		m_flipSprite = true;
 	// Float(m_collider.getVelocity());
 	Input();
+
+	if (m_iceBulletes.isEmpty()) return;
+
+    for (auto& bullet : m_iceBulletes){
+        bullet->Update(deltaTime);
+
+        // 非アクティブ化した弾を配列から削除
+        if(!bullet->IsActive()){
+            m_iceBulletes.remove(bullet);
+        }
+    }
+	Print << m_iceBulletes.size();
 }
 
 void PlayerController::Draw()
@@ -144,6 +180,12 @@ void PlayerController::Draw()
 			break;
 	}
 	m_sprite(0, 0, cellSize, cellSize).resized(200).mirrored(m_flipSprite).drawAt(m_collider.getPos());
+
+	if (m_iceBulletes.isEmpty()) return;
+
+    for (auto& bullet : m_iceBulletes){
+        bullet->Draw();
+    }
 }
 
 State PlayerController::GetState()
@@ -169,4 +211,9 @@ void PlayerController::OnDamage(double damage)
 double PlayerController::EP()
 {
     return m_ep;
+}
+
+Array<IceBullete*>* PlayerController::GetBullets()
+{
+    return &m_iceBulletes;
 }

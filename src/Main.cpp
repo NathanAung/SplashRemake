@@ -30,7 +30,8 @@ void Main()
 		ClearPrint();
 		// Print << U"bodies.size(): " << bodies.size() << U"\n";
 
-		for (accumulatedTime += Scene::DeltaTime(); StepTime <= accumulatedTime; accumulatedTime -= StepTime)
+		double deltaTime = Scene::DeltaTime();
+		for (accumulatedTime += deltaTime; StepTime <= accumulatedTime; accumulatedTime -= StepTime)
 		{
 			// 2D 物理演算のワールドを StepTime 秒進める
 			world.update(StepTime);
@@ -38,7 +39,7 @@ void Main()
 			// 地面の下に 500 cm 以上落下した物体を削除する
 			// bodies.remove_if([](const P2Body& body) { return (500 < body.getPos().y); });
 		}
-		m_player.Update();
+		m_player.Update(deltaTime);
 		camera.Update();
 		camera.Draw(grounds);
 	}
